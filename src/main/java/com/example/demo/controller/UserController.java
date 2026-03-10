@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +22,8 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    public ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest user) {
-        ApiResponse<User> apiResponse = new ApiResponse<>();
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest user) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.createUser(user));
 
         return apiResponse;

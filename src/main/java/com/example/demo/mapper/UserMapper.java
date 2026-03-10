@@ -4,8 +4,6 @@ import com.example.demo.dto.request.UserCreationRequest;
 import com.example.demo.dto.request.UserUpdateRequest;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.mapstruct.MapMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

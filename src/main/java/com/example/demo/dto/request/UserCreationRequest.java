@@ -1,6 +1,5 @@
 package com.example.demo.dto.request;
 
-import com.example.demo.exception.ErrorCode;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
