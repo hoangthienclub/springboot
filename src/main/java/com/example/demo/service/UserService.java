@@ -8,6 +8,7 @@ import com.example.demo.enums.Role;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.Set;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
+    RoleRepository  roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -63,6 +65,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
+
+        log.info("user roles {}", user.getUsername());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -71,7 +79,8 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')") // sẽ dùng những authority có prefix là ROLE_
+    @PreAuthorize("hasAuthority('ADMIN')") // sẽ dùng chính xác không tính prefix
     public List<UserResponse> getUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toUserResponse).toList();
