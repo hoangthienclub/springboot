@@ -16,6 +16,8 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse> handlingRuntimeException(Exception e) {
         ApiResponse<String>  apiResponse = new ApiResponse<>();
 
+        log.error(e.getMessage());
+
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
 
@@ -50,6 +52,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException e) {
         String enumKey = e.getFieldError().getDefaultMessage();
+
+        log.info("enumKey:{}", enumKey);
 
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
         try {
