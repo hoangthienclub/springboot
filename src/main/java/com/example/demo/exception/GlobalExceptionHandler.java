@@ -1,17 +1,19 @@
 package com.example.demo.exception;
 
 import com.example.demo.dto.request.ApiResponse;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ApiResponse> handlingRuntimeException(Exception e) {
+    ResponseEntity<ApiResponse> handlingRuntimeException(Exception e) {
         ApiResponse<String>  apiResponse = new ApiResponse<>();
 
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
@@ -21,18 +23,32 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = AppException.class)
-    public ResponseEntity<ApiResponse> handlingAppException(AppException e) {
+    ResponseEntity<ApiResponse> handlingAppException(AppException e) {
         ErrorCode errorCode = e.getErrorCode();
-        ApiResponse<String>  apiResponse = new ApiResponse<>();
+        ApiResponse<String> apiResponse = new ApiResponse<>();
 
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity
+                .status(errorCode.getStatusCode())
+                .body(apiResponse);
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException e) {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;;
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(
+                ApiResponse.builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build()
+        );
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException e) {
+    ResponseEntity<ApiResponse> handlingValidation(MethodArgumentNotValidException e) {
         String enumKey = e.getFieldError().getDefaultMessage();
 
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
