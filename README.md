@@ -13,3 +13,16 @@
 
 # Profile
     - VM option: -Dspring.profiles.active=prod
+
+# Deploy
+## Solution 1
+    - clean: ./mvnw clean
+    - build: ./mvnw package 
+    - build without test: ./mvnw package -DskipTests
+    - run: java -jar ./target/demo-0.0.1-SNAPSHOT.jar
+## Solution 2
+    - install maven
+    - clean: mvn clean
+    - build: mvn package
+    - build without test: mvn package -DskipTests
+    - run: java -jar ./target/demo-0.0.1-SNAPSHOT.jar

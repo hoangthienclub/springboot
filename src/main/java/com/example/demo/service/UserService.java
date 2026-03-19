@@ -3,18 +3,18 @@ package com.example.demo.service;
 import java.util.HashSet;
 import java.util.List;
 
-import com.example.demo.constant.PredefinedRole;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.constant.PredefinedRole;
 import com.example.demo.dto.request.UserCreationRequest;
 import com.example.demo.dto.request.UserUpdateRequest;
 import com.example.demo.dto.response.UserResponse;
-import com.example.demo.entity.User;
 import com.example.demo.entity.Role;
+import com.example.demo.entity.User;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
 import com.example.demo.mapper.UserMapper;
@@ -46,8 +46,8 @@ public class UserService {
 
         try {
             user = userRepository.save(user);
-        } catch(DataIntegrityViolationException e) {
-           throw new AppException(ErrorCode.USER_EXISTED);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
 
         return userMapper.toUserResponse(user);
@@ -79,8 +79,8 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-//    @PreAuthorize("hasRole('ADMIN')") // sẽ dùng những authority có prefix là ROLE_
-//    @PreAuthorize("hasAuthority('ADMIN')") // sẽ dùng chính xác không tính prefix
+    //    @PreAuthorize("hasRole('ADMIN')") // sẽ dùng những authority có prefix là ROLE_
+    //    @PreAuthorize("hasAuthority('ADMIN')") // sẽ dùng chính xác không tính prefix
     public List<UserResponse> getUsers() {
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
