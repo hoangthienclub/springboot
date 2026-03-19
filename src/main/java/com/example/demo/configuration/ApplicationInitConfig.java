@@ -9,6 +9,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,7 +30,12 @@ public class ApplicationInitConfig {
 
     // chạy mỗi lần start application
     @Bean
+    @ConditionalOnProperty(prefix = "spring",
+        value = "datasource.driveClassName",
+        havingValue = "com.mysql.cj.jdbc.Driver"
+    )
     ApplicationRunner applicationRunner(UserRepository userRepository) {
+        log.info("Init ApplicationRunner");
         return args -> {
            if (userRepository.findByUsername("admin").isEmpty()) {
                Set<String> roles = new HashSet<String>();
