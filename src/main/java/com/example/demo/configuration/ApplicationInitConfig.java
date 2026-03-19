@@ -3,6 +3,10 @@ package com.example.demo.configuration;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.demo.constant.PredefinedRole;
+import com.example.demo.entity.Role;
+import com.example.demo.repository.RoleRepository;
+import lombok.experimental.NonFinal;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.demo.entity.User;
-import com.example.demo.enums.Role;
 import com.example.demo.repository.UserRepository;
 
 import lombok.AccessLevel;
@@ -27,23 +30,39 @@ public class ApplicationInitConfig {
 
     PasswordEncoder passwordEncoder;
 
+    @NonFinal
+    static final String ADMIN_USER_NAME = "admin";
+
+    @NonFinal
+    static final String ADMIN_PASSWORD = "admin";
+
     // chạy mỗi lần start application
     @Bean
     @ConditionalOnProperty(
             prefix = "spring",
-            value = "datasource.driveClassName",
+            value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")
-    ApplicationRunner applicationRunner(UserRepository userRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         log.info("Init ApplicationRunner");
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
-                Set<String> roles = new HashSet<String>();
-                roles.add(Role.ADMIN.name());
+            if (userRepository.findByUsername(ADMIN_USER_NAME).isEmpty()) {
+                roleRepository.save(Role.builder()
+                        .name(PredefinedRole.USER_ROLE)
+                        .description("User role")
+                        .build());
+
+                Role adminRole = roleRepository.save(Role.builder()
+                        .name(PredefinedRole.ADMIN_ROLE)
+                        .description("Admin role")
+                        .build());
+
+                Set<Role> roles = new HashSet<Role>();
+                roles.add(adminRole);
 
                 User user = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
-                        //                       .roles(roles)
+                        .roles(roles)
                         .build();
                 userRepository.save(user);
                 log.warn("Admin has been created with default password: admin, please change it");
