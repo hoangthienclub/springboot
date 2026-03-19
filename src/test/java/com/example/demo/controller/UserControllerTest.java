@@ -1,9 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.request.UserCreationRequest;
-import com.example.demo.dto.response.UserResponse;
-import com.example.demo.service.UserService;
-import lombok.extern.slf4j.Slf4j;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.example.demo.dto.request.UserCreationRequest;
+import com.example.demo.dto.response.UserResponse;
+import com.example.demo.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-import java.util.Date;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Slf4j
@@ -57,7 +58,6 @@ public class UserControllerTest {
                 .lastName("Doe")
                 .dob(dob)
                 .build();
-
     }
 
     @Test
@@ -66,18 +66,15 @@ public class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(request);
 
-        when(userService.createUser(any()))
-                .thenReturn(userResponse);
+        when(userService.createUser(any())).thenReturn(userResponse);
 
         // WHEN, THEN
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content))
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
-                .andExpect(MockMvcResultMatchers.jsonPath("result.id").value(userResponse.getId())
-        );
+                .andExpect(MockMvcResultMatchers.jsonPath("result.id").value(userResponse.getId()));
     }
 
     @Test
@@ -88,14 +85,12 @@ public class UserControllerTest {
         String content = mapper.writeValueAsString(request);
 
         // WHEN, THEN
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(content))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1004))
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must be at least 4 characters")
-                );
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Username must be at least 4 characters"));
     }
 
     @Test
@@ -106,14 +101,12 @@ public class UserControllerTest {
         String content = mapper.writeValueAsString(request);
 
         // WHEN, THEN
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(content))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1005))
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Password must be at least 8 characters")
-                );
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Password must be at least 8 characters"));
     }
 
     @Test
@@ -124,13 +117,11 @@ public class UserControllerTest {
         String content = mapper.writeValueAsString(request);
 
         // WHEN, THEN
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/users")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(content))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1009))
-                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Your age must be at least 18")
-                );
+                .andExpect(MockMvcResultMatchers.jsonPath("message").value("Your age must be at least 18"));
     }
 }

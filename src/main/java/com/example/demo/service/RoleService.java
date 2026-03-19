@@ -1,18 +1,20 @@
 package com.example.demo.service;
 
+import java.util.HashSet;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.example.demo.dto.request.RoleRequest;
 import com.example.demo.dto.response.RoleResponse;
 import com.example.demo.mapper.RoleMapper;
 import com.example.demo.repository.PermissionRepository;
 import com.example.demo.repository.RoleRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +22,10 @@ import java.util.List;
 @Slf4j
 public class RoleService {
     RoleRepository roleRepository;
-    PermissionRepository  permissionRepository;
+    PermissionRepository permissionRepository;
     RoleMapper roleMapper;
 
-    public RoleResponse create(RoleRequest request)  {
+    public RoleResponse create(RoleRequest request) {
         var role = roleMapper.toRole(request);
         log.info("role={}", role);
 
@@ -35,10 +37,7 @@ public class RoleService {
 
     public List<RoleResponse> findAll() {
         var roles = roleRepository.findAll();
-        return roles
-                .stream()
-                .map(roleMapper::toRoleResponse)
-                .toList();
+        return roles.stream().map(roleMapper::toRoleResponse).toList();
     }
 
     public void delete(String roleId) {

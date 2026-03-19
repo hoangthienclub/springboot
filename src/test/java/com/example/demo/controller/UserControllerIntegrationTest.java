@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.request.UserCreationRequest;
-import com.example.demo.dto.response.UserResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +16,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.example.demo.dto.request.UserCreationRequest;
+import com.example.demo.dto.response.UserResponse;
+
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Slf4j
@@ -45,6 +44,7 @@ public class UserControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc; // tạo mock request gọi tới api
+
     private UserCreationRequest request;
     private UserResponse userResponse;
     private LocalDate dob;
@@ -67,7 +67,6 @@ public class UserControllerIntegrationTest {
                 .lastName("Doe")
                 .dob(dob)
                 .build();
-
     }
 
     @Test
@@ -77,10 +76,9 @@ public class UserControllerIntegrationTest {
         String content = mapper.writeValueAsString(request);
 
         // WHEN, THEN
-        var response = mockMvc.perform(MockMvcRequestBuilders
-                .post("/users")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content))
+        var response = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.username").value(userResponse.getUsername()))

@@ -1,7 +1,5 @@
 package com.example.demo.configuration;
 
-import com.example.demo.enums.Role;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,47 +11,44 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import javax.crypto.spec.SecretKeySpec;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity //phân quyền trên method, muốn ở đâu thì chỉ cần đặt annotation ở hàm đó
+@EnableMethodSecurity // phân quyền trên method, muốn ở đâu thì chỉ cần đặt annotation ở hàm đó
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users",
-            "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
+    private final String[] PUBLIC_ENDPOINTS = {
+        "/users", "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
 
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
     @Autowired
-    private CustomJwtDecoder  customJwtDecoder;
+    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        // phân quyền trên endpoint, tuy nhiên không tốt
-//                        .requestMatchers(HttpMethod.GET, "/users")
-//                        .hasRole(Role.ADMIN.name())
-                .anyRequest().authenticated());
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                // phân quyền trên endpoint, tuy nhiên không tốt
+                //                        .requestMatchers(HttpMethod.GET, "/users")
+                //                        .hasRole(Role.ADMIN.name())
+                .anyRequest()
+                .authenticated());
 
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-            oauth2.jwt(jwtConfigurer ->
-                    jwtConfigurer.decoder(customJwtDecoder)
-                            .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
-//        httpSecurity.csrf(httpCsrf -> httpCsrf.disable());
+        //        httpSecurity.csrf(httpCsrf -> httpCsrf.disable());
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -65,7 +60,7 @@ public class SecurityConfig {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
-        JwtAuthenticationConverter  jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }

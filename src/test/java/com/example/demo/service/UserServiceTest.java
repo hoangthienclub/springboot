@@ -1,10 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.request.UserCreationRequest;
-import com.example.demo.dto.response.UserResponse;
-import com.example.demo.entity.User;
-import com.example.demo.exception.AppException;
-import com.example.demo.repository.UserRepository;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +17,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.example.demo.dto.request.UserCreationRequest;
+import com.example.demo.dto.response.UserResponse;
+import com.example.demo.entity.User;
+import com.example.demo.exception.AppException;
+import com.example.demo.repository.UserRepository;
 
 @SpringBootTest
 @TestPropertySource("/test.properties")
@@ -89,8 +90,7 @@ public class UserServiceTest {
         });
 
         // WHAT
-        Assertions.assertThat(exception.getErrorCode().getCode())
-                .isEqualTo(1002);
+        Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1002);
     }
 
     @Test
@@ -108,8 +108,7 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "john1")
     void getMyInfo_userNotFound_fail() {
-        when(userRepository.findByUsername(anyString()))
-                .thenReturn(Optional.ofNullable(null));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(null));
 
         // WHEN
         var exception = assertThrows(AppException.class, () -> {
@@ -117,7 +116,6 @@ public class UserServiceTest {
         });
 
         // WHAT
-        Assertions.assertThat(exception.getErrorCode().getCode())
-                .isEqualTo(1003);
+        Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1003);
     }
 }
