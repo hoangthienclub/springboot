@@ -23,6 +23,7 @@ import com.example.demo.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest
 @Slf4j
@@ -97,7 +98,7 @@ public class UserControllerTest {
     void createUser_passwordInvalid_fail() throws Exception {
         // GIVEN
         request.setPassword("abc");
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonMapper.builder().build();
         String content = mapper.writeValueAsString(request);
 
         // WHEN, THEN

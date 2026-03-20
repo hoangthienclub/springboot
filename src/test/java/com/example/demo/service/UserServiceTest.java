@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -21,6 +22,8 @@ import com.example.demo.dto.request.UserCreationRequest;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.entity.User;
 import com.example.demo.exception.AppException;
+import com.example.demo.exception.ErrorCode;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 
 @SpringBootTest
@@ -31,6 +34,9 @@ public class UserServiceTest {
 
     @MockitoBean
     private UserRepository userRepository;
+
+    @MockitoBean
+    private RoleRepository roleRepository;
 
     private UserCreationRequest request;
     private UserResponse userResponse;
@@ -70,6 +76,7 @@ public class UserServiceTest {
         // GIVEN
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.save(any())).thenReturn(user);
+        when(roleRepository.findById(any())).thenReturn(Optional.ofNullable(null));
 
         // WHEN
         var response = userService.createUser(request);
@@ -82,15 +89,13 @@ public class UserServiceTest {
     @Test
     void createUser_userExisted_fail() {
         // GIVEN
-        when(userRepository.existsByUsername(anyString())).thenReturn(true);
+        when(userRepository.save(any())).thenThrow(new DataIntegrityViolationException("User existed"));
 
         // WHEN
-        var exception = assertThrows(AppException.class, () -> {
-            userService.createUser(request);
-        });
+        var exception = assertThrows(AppException.class, () -> userService.createUser(request));
 
         // WHAT
-        Assertions.assertThat(exception.getErrorCode().getCode()).isEqualTo(1002);
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_EXISTED);
     }
 
     @Test
